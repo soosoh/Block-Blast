@@ -18,7 +18,7 @@ public void setup()
   b1 = new Block("l", 0);
   b2 = new Block("o", 1);
   b3 = new Block("i", 2);
-  //TODO: add randomization
+  //TODO: add randomization also on reload
   
   //initialize colors
   for(int r = 0; r < grid.length; r++)
@@ -121,9 +121,21 @@ public void mainSnap(Block piece, int position)
     int rSnap = Integer.parseInt(snapOut.substring(2,3));
     for(int i = 0; i < piece.shapeX.length; i++)
     {
+      if(grid[rSnap + piece.shapeY[i]][cSnap + piece.shapeX[i]] != 0)
+      {
+        piece.valid = false;
+        return;
+      }
+    }
+    for(int i = 0; i < piece.shapeX.length; i++)
+    {
       grid[rSnap + piece.shapeY[i]][cSnap + piece.shapeX[i]] = piece.c;
     }
     pieces[position] = false;
+    if(pieces[0] == false && pieces[1] == false && pieces[2] == false)
+    {
+      reload();
+    }
   }
   else if(!snapOut.equals("N/A"))
   {
@@ -132,7 +144,30 @@ public void mainSnap(Block piece, int position)
     int cSnap = Integer.parseInt(snapOut.split(",")[0]);
     for(int i = 0; i < piece.shapeX.length; i++)
     {
+      if(grid[rSnap + piece.shapeY[i]][cSnap + piece.shapeX[i]] != 0)
+      {
+        piece.hoverValid = false;
+        return;
+      }
+    }
+    for(int i = 0; i < piece.shapeX.length; i++)
+    {
       colors[rSnap + piece.shapeY[i]][cSnap + piece.shapeX[i]] = search.getColor(-1);
     }
   }
+}
+
+public void reload()
+{
+  b1 = new Block("o", 0);
+  b2 = new Block("l", 1);
+  b3 = new Block("i", 2);
+  
+  pieces[0] = true;
+  pieces[1] = true;
+  pieces[2] = true;
+}
+
+public void lineClear()
+{
 }

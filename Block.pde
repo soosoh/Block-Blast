@@ -10,6 +10,8 @@ public class Block
   public int xDist, yDist;
   public boolean selected;
   public boolean snap = false;
+  public boolean valid = true;
+  public boolean hoverValid = true;
   public ColorBox search = new ColorBox(0, 0, 0);
   
   public Block(String type, int position)
@@ -79,6 +81,13 @@ public class Block
   
   public String snap()
   {
+    if(!valid)
+    {
+      valid = true;
+      x = x0;
+      y = y0;
+      return "N/A";
+    }
     int xSnap = (x - 100) / 50;
     int ySnap = (y - 100) / 50;
     if(snap)
@@ -86,7 +95,7 @@ public class Block
       this.snap = false;
       if(ySnap < 0 || ySnap > 8 - h || xSnap < 0 || xSnap > 8 - w)
       {
-        x= x0;
+        x = x0;
         y = y0;
         return "N/A";
       }
@@ -95,8 +104,9 @@ public class Block
         return "s" + xSnap + ySnap;
       }
     }
-    if(ySnap < 0 || ySnap > 8 - h || xSnap < 0 || xSnap > 8 - w)
+    if(ySnap < 0 || ySnap > 8 - h || xSnap < 0 || xSnap > 8 - w || !hoverValid)
     {
+      hoverValid = true;
       return "N/A";
     }
     else
