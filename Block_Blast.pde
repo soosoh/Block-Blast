@@ -1,29 +1,43 @@
-//grid, colors
+/*
+BLOCK BLAST in PROCESSING
+By Hangyul Park, Rithvik Chamarthi
+*/
+
+//initialize grid starting point
+final int x0 = 100;
+final int y0 = 100;
+
+//initialize grid
 int[][] grid = new int[8][8];
-ColorBox[][] colors = new ColorBox[8][8];
-int x0 = 100;
-int y0 = 100;
 
-//pieces
-boolean[] pieces = new boolean[]{true, true, true};
-Block b1, b2, b3;
+//initialize color assignment container
+Color[][] colors = new Color[8][8];
+//color search
+Color search = new Color(0, 0, 0);
 
-ColorBox search = new ColorBox(0, 0, 0);
+//initialize piece container
+Piece[] pieces = new Piece[3];
+
+//initialize score
+int score = 0;
+//initialize combo
+int combo = 1;
+
+//states game over when grid rendering is complete
+boolean over;
 
 public void setup()
 {
+  //set frame size
   size(600, 800);
   
-  //inital blocks
-  b1 = new Block("l", 0);
-  b2 = new Block("o", 1);
-  b3 = new Block("i", 2);
-  //TODO: add randomization also on reload
+  //initalize pieces
+  reload();
   
-  //initialize colors
-  for(int r = 0; r < grid.length; r++)
+  //initialize color assignment
+  for(int r = 0; r < colors.length; r++)
   {
-    for(int c = 0; c < grid[r].length; c++)
+    for(int c = 0; c < colors[r].length; c++)
     {
       colors[r][c] = search.getColor(0);
     }
@@ -32,32 +46,27 @@ public void setup()
 
 public void draw()
 {
+  //fill background
   background(54, 127, 245);
+  //disable stroke
   noStroke();
   
-  ColorBox cBox;
-  
-  //initial colors
-  for(int r = 0; r < grid.length; r++)
+  //color assignment
+  for(int r = 0; r < colors.length; r++)
   {
-    for(int c = 0; c < grid[r].length; c++)
+    for(int c = 0; c < colors[r].length; c++)
     {
       colors[r][c] = search.getColor(grid[r][c]);
     }
   }
   
   //snap
-  if(pieces[0])
+  for(int i = 0; i < pieces.length; i++)
   {
-    mainSnap(b1, 0);
-  }
-  if(pieces[1])
-  {
-    mainSnap(b2, 1);
-  }
-  if(pieces[2])
-  {
-    mainSnap(b3, 2);
+    if(pieces[i] != null)
+    {
+      snap(pieces[i], i);
+    }
   }
   
   //render grid
@@ -67,8 +76,8 @@ public void draw()
   {
     for(int c = 0; c < grid[r].length; c++)
     {
-      cBox = colors[r][c];
-      fill(cBox.r, cBox.g, cBox.b);
+      Color thisColor = colors[r][c];
+      fill(thisColor.r, thisColor.g, thisColor.b);
       rect(x, y, 50, 50);
       x += 50;
     }
@@ -76,98 +85,263 @@ public void draw()
     y += 50;
   }
   
-  //render blocks
-  if(pieces[0])
+  //render score
+  textSize(80);
+  textAlign(CENTER);
+  fill(9, 54, 128);
+  text(score, 300, 70);
+  
+  //render combo
+  textSize(30);
+  textAlign(LEFT);
+  fill(9, 54, 128);
+  text("x" + combo, 470, 70);
+  
+  //render pieces
+  for(int i = 0; i < pieces.length; i++)
   {
-    b1.render();
+    if(pieces[i] != null)
+    {
+      pieces[i].render();
+    }
   }
-  if(pieces[1])
+  
+  //game over
+  if(over)
   {
-    b2.render();
-  }
-  if(pieces[2])
-  {
-    b3.render();
+    gameOver();
   }
 }
 
 public void mouseReleased()
 {
-  //snap on release
-  if(b1.selected)
+  //snap and disable drag on release
+  for(int i = 0; i < pieces.length; i++)
   {
-    b1.dragOff();
-    b1.snap = true;
-  }
-  else if(b2.selected)
-  {
-    b2.dragOff();
-    b2.snap = true;
-  }
-  else if(b3.selected)
-  {
-    b3.dragOff();
-    b3.snap = true;
+    if(pieces[i] != null && pieces[i].selected)
+    {
+      pieces[i].dragOff();
+      pieces[i].place = true;
+      break;
+    }
   }
 }
 
-public void mainSnap(Block piece, int position)
+public void snap(Piece piece, int position)
 {
-  String snapOut = piece.snap();
-  if(snapOut.substring(0,1).equals("s"))
+  //retrieve snap output
+  String snap = piece.snap();
+  
+  if(snap.equals("")) //no interaction
   {
-    //place block
-    int cSnap = Integer.parseInt(snapOut.substring(1,2));
-    int rSnap = Integer.parseInt(snapOut.substring(2,3));
+    return;
+  }
+  
+  if(snap.substring(0,1).equals("p")) //place piece
+  {
+    int xSnap = Integer.parseInt(snap.substring(1,2));
+    int ySnap = Integer.parseInt(snap.substring(2,3));
+    
+    //placing validation
     for(int i = 0; i < piece.shapeX.length; i++)
     {
-      if(grid[rSnap + piece.shapeY[i]][cSnap + piece.shapeX[i]] != 0)
+      if(grid[ySnap + piece.shapeY[i]][xSnap + piece.shapeX[i]] != 0)
       {
         piece.valid = false;
         return;
       }
     }
+    
+    //update grid
     for(int i = 0; i < piece.shapeX.length; i++)
     {
-      grid[rSnap + piece.shapeY[i]][cSnap + piece.shapeX[i]] = piece.c;
+      grid[ySnap + piece.shapeY[i]][xSnap + piece.shapeX[i]] = piece.c;
     }
-    pieces[position] = false;
-    if(pieces[0] == false && pieces[1] == false && pieces[2] == false)
+    
+    //update score
+    score += piece.shapeX.length * 10;
+    
+    //delete piece
+    pieces[position] = null;
+    
+    //clear lines
+    clearLines();
+    
+    //reload if there are no pieces left
+    boolean reload = true;
+    for(int i = 0; i < pieces.length; i++)
+    {
+      if(pieces[i] != null)
+      {
+        reload = false;
+      }
+    }
+    if(reload)
     {
       reload();
     }
+    
+    //check for game over
+    over = true;
+    for(int i = 0; i < pieces.length; i++)
+    {
+       if(pieces[i] != null && piece.validate(grid, pieces[i]))
+       {
+         over = false;
+       }
+    }
   }
-  else if(!snapOut.equals("N/A"))
+  else if(snap.substring(0,1).equals("t")) //track piece
   {
-    //only hover
-    int rSnap = Integer.parseInt(snapOut.split(",")[1]);
-    int cSnap = Integer.parseInt(snapOut.split(",")[0]);
+    int xSnap = Integer.parseInt(snap.substring(1,2));
+    int ySnap = Integer.parseInt(snap.substring(2,3));
+    
+    //tracking validation
     for(int i = 0; i < piece.shapeX.length; i++)
     {
-      if(grid[rSnap + piece.shapeY[i]][cSnap + piece.shapeX[i]] != 0)
+      if(grid[ySnap + piece.shapeY[i]][xSnap + piece.shapeX[i]] != 0)
       {
-        piece.hoverValid = false;
+        piece.valid = false;
         return;
       }
     }
+    
+    //color assignment
     for(int i = 0; i < piece.shapeX.length; i++)
     {
-      colors[rSnap + piece.shapeY[i]][cSnap + piece.shapeX[i]] = search.getColor(-1);
+      colors[ySnap + piece.shapeY[i]][xSnap + piece.shapeX[i]] = search.getColor(-1);
     }
   }
 }
 
 public void reload()
 {
-  b1 = new Block("o", 0);
-  b2 = new Block("l", 1);
-  b3 = new Block("i", 2);
-  
-  pieces[0] = true;
-  pieces[1] = true;
-  pieces[2] = true;
+  //reload pieces
+  for(int i = 0; i < pieces.length; i++)
+  {
+    //TODO: update fakeGrid so all pieces can be put
+    //TODO: then account for instances where space can be made by removing lines(ask mr rizzi)
+    pieces[i] = new Piece(grid, i);
+    if(pieces[i].over)
+    {
+      gameOver();
+    }
+  }
 }
 
-public void lineClear()
+public void clearLines()
 {
+  //clear lines unformly filled
+  ArrayList<Integer> clearRows = new ArrayList<Integer>();
+  ArrayList<Integer> clearCols = new ArrayList<Integer>();
+  
+  //check rows
+  for(int r = 0; r < grid.length; r++)
+  {
+    boolean filled = true;
+    for(int c = 0; c < grid.length; c++)
+    {
+      if(grid[r][c] == 0)
+      {
+        filled = false;
+      }
+    }
+    if(filled)
+    {
+      clearRows.add(r);
+    }
+  }
+  
+  //check columns
+  for(int c = 0; c < grid[0].length; c++)
+  {
+    boolean filled = true;
+    for(int r = 0; r < grid.length; r++)
+    {
+      if(grid[r][c] == 0)
+      {
+        filled = false;
+      }
+    }
+    if(filled)
+    {
+      clearCols.add(c);
+    }
+  }
+  
+  //update rows
+  for(int r = 0; r < grid.length; r++)
+  {
+    if(clearRows.contains(r))
+    {
+      for(int c = 0; c < grid.length; c++)
+      {
+        grid[r][c] = 0;
+      }
+    }
+  }
+  
+  //update columns
+  for(int c = 0; c < grid[0].length; c++)
+  {
+    if(clearCols.contains(c))
+    {
+      for(int r = 0; r < grid.length; r++)
+      {
+        grid[r][c] = 0;
+      }
+    }
+  }
+  
+  //combo logic
+  if(clearRows.size() + clearCols.size() > 0)
+  {
+    combo++;
+  }
+  else
+  {
+    combo = 1;
+  }
+  
+  //update score
+  score += combo * 100 * (clearRows.size() + clearCols.size());
+}
+
+public void gameOver()
+{
+  background(54, 127, 245);
+  
+  //render grid
+  int x = x0;
+  int y = y0;
+  for(int r = 0; r < grid.length; r++)
+  {
+    for(int c = 0; c < grid[r].length; c++)
+    {
+      Color thisColor = colors[r][c];
+      fill(thisColor.r, thisColor.g, thisColor.b);
+      rect(x, y, 50, 50);
+      x += 50;
+    }
+    x = x0;
+    y += 50;
+  }
+  
+  //render score
+  textSize(80);
+  textAlign(CENTER);
+  fill(9, 54, 128);
+  text(score, 300, 70);
+  
+  //render combo
+  textSize(30);
+  textAlign(LEFT);
+  text("x" + combo, 470, 70);
+  
+  //game over text
+  textSize(80);
+  textAlign(CENTER);
+  text("GAME OVER", 300, 670);
+  
+  noLoop();
 }
