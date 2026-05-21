@@ -1,5 +1,6 @@
 public class Color
 {
+  //TODO: make themes?
   public int r, g, b;
   
   public Color(int r, int g, int b)

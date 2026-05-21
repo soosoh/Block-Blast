@@ -24,89 +24,26 @@ int score = 0;
 int combo = 1;
 
 //states game over when grid rendering is complete
-boolean over;
+boolean over = false;
 
 public void setup()
 {
-  //set frame size
   size(600, 800);
-  
-  //initalize pieces
   reload();
-  
-  //initialize color assignment
-  for(int r = 0; r < colors.length; r++)
-  {
-    for(int c = 0; c < colors[r].length; c++)
-    {
-      colors[r][c] = search.getColor(0);
-    }
-  }
+  noStroke();
 }
 
 public void draw()
 {
   //fill background
   background(54, 127, 245);
-  //disable stroke
-  noStroke();
-  
-  //color assignment
-  for(int r = 0; r < colors.length; r++)
-  {
-    for(int c = 0; c < colors[r].length; c++)
-    {
-      colors[r][c] = search.getColor(grid[r][c]);
-    }
-  }
-  
-  //snap
-  for(int i = 0; i < pieces.length; i++)
-  {
-    if(pieces[i] != null)
-    {
-      snap(pieces[i], i);
-    }
-  }
-  
-  //render grid
-  int x = x0;
-  int y = y0;
-  for(int r = 0; r < grid.length; r++)
-  {
-    for(int c = 0; c < grid[r].length; c++)
-    {
-      Color thisColor = colors[r][c];
-      fill(thisColor.r, thisColor.g, thisColor.b);
-      rect(x, y, 50, 50);
-      x += 50;
-    }
-    x = x0;
-    y += 50;
-  }
-  
-  //render score
-  textSize(80);
-  textAlign(CENTER);
-  fill(9, 54, 128);
-  text(score, 300, 70);
-  
-  //render combo
-  textSize(30);
-  textAlign(LEFT);
-  fill(9, 54, 128);
-  text("x" + combo, 470, 70);
-  
-  //render pieces
-  for(int i = 0; i < pieces.length; i++)
-  {
-    if(pieces[i] != null)
-    {
-      pieces[i].render();
-    }
-  }
-  
-  //game over
+  assignColors();
+  //TODO: Scheck for pieces to be cleared and make an hover effect
+  //TODO: make effects
+  snapPieces();
+  renderGrid();
+  renderPieces();
+  renderScore();
   if(over)
   {
     gameOver();
@@ -127,6 +64,30 @@ public void mouseReleased()
   }
 }
 
+public void assignColors()
+{
+  //color assignment
+  for(int r = 0; r < colors.length; r++)
+  {
+    for(int c = 0; c < colors[r].length; c++)
+    {
+      colors[r][c] = search.getColor(grid[r][c]);
+    }
+  }
+}
+
+public void snapPieces()
+{
+  //snap
+  for(int i = 0; i < pieces.length; i++)
+  {
+    if(pieces[i] != null)
+    {
+      snap(pieces[i], i);
+    }
+  }
+}
+
 public void snap(Piece piece, int position)
 {
   //retrieve snap output
@@ -137,21 +98,21 @@ public void snap(Piece piece, int position)
     return;
   }
   
-  if(snap.substring(0,1).equals("p")) //place piece
+  int xSnap = Integer.parseInt(snap.substring(1,2));
+  int ySnap = Integer.parseInt(snap.substring(2,3));
+  
+  //placing validation
+  for(int i = 0; i < piece.shapeX.length; i++)
   {
-    int xSnap = Integer.parseInt(snap.substring(1,2));
-    int ySnap = Integer.parseInt(snap.substring(2,3));
-    
-    //placing validation
-    for(int i = 0; i < piece.shapeX.length; i++)
+    if(grid[ySnap + piece.shapeY[i]][xSnap + piece.shapeX[i]] != 0)
     {
-      if(grid[ySnap + piece.shapeY[i]][xSnap + piece.shapeX[i]] != 0)
-      {
-        piece.valid = false;
-        return;
-      }
+      piece.valid = false;
+      return;
     }
-    
+  }
+  
+  if(snap.substring(0,1).equals("p")) //place piece
+  {  
     //update grid
     for(int i = 0; i < piece.shapeX.length; i++)
     {
@@ -193,19 +154,6 @@ public void snap(Piece piece, int position)
   }
   else if(snap.substring(0,1).equals("t")) //track piece
   {
-    int xSnap = Integer.parseInt(snap.substring(1,2));
-    int ySnap = Integer.parseInt(snap.substring(2,3));
-    
-    //tracking validation
-    for(int i = 0; i < piece.shapeX.length; i++)
-    {
-      if(grid[ySnap + piece.shapeY[i]][xSnap + piece.shapeX[i]] != 0)
-      {
-        piece.valid = false;
-        return;
-      }
-    }
-    
     //color assignment
     for(int i = 0; i < piece.shapeX.length; i++)
     {
@@ -307,10 +255,44 @@ public void clearLines()
   score += combo * 100 * (clearRows.size() + clearCols.size());
 }
 
-public void gameOver()
+public void renderScore()
 {
-  background(54, 127, 245);
+  //set text color
+  fill(9, 54, 128);
   
+  //render score
+  textSize(80);
+  textAlign(CENTER);
+  text(score, 300, 70);
+  
+  //render combo
+  textSize(30);
+  textAlign(LEFT);
+  text("x" + combo, 470, 70);
+  /*
+  if (60<=score&&score<=68 )
+  {
+    textSize(100);
+    textAlign(CENTER);
+    text( 67676767, 300,100);
+  }
+  */
+}
+
+public void renderPieces()
+{
+  //render pieces
+  for(int i = 0; i < pieces.length; i++)
+  {
+    if(pieces[i] != null)
+    {
+      pieces[i].render();
+    }
+  }
+}
+
+public void renderGrid()
+{
   //render grid
   int x = x0;
   int y = y0;
@@ -326,17 +308,13 @@ public void gameOver()
     x = x0;
     y += 50;
   }
-  
-  //render score
-  textSize(80);
-  textAlign(CENTER);
-  fill(9, 54, 128);
-  text(score, 300, 70);
-  
-  //render combo
-  textSize(30);
-  textAlign(LEFT);
-  text("x" + combo, 470, 70);
+}
+
+public void gameOver()
+{
+  background(54, 127, 245);
+  renderGrid();
+  renderScore();
   
   //game over text
   textSize(80);

@@ -94,9 +94,6 @@ public class Piece
   
   public void render()
   {
-    //disable stroke
-    noStroke();
-    
     //set color
     Color thisColor = search.getColor(c);
     fill(thisColor.r, thisColor.g, thisColor.b);
@@ -138,6 +135,7 @@ public class Piece
     if(reset) //reset to dock
     {
       reset = false;
+      place = false;
       x = x0;
       y = y0;
       return "";
