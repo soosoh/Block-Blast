@@ -18,6 +18,9 @@ Color search = new Color(0, 0, 0);
 //initialize piece container
 Piece[] pieces = new Piece[3];
 
+//initialize drag switch
+int drag = -1;
+
 //initialize score
 int score = 0;
 //initialize combo
@@ -62,6 +65,8 @@ public void mouseReleased()
       break;
     }
   }
+  
+  drag = -1;
 }
 
 public void assignColors()
@@ -286,7 +291,10 @@ public void renderPieces()
   {
     if(pieces[i] != null)
     {
-      pieces[i].render();
+      if(pieces[i].render(drag, i))
+      {
+        drag = i;
+      }
     }
   }
 }

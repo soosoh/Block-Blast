@@ -13,7 +13,23 @@ public class Piece
     "HL3",
     "VL3",
     "OL3",
-    "S4"
+    "S4",
+    "UT4",
+    "RT4",
+    "DT4",
+    "LT4",
+    "D3",
+    "ID3",
+    "S9",
+    "UL4",
+    "RL4",
+    "DL4",
+    "LL4",
+    "J4",
+    "UJ4",
+    "RJ4",
+    "DJ4",
+    "LJ4"
   };
   
   //individual block coordinates
@@ -92,7 +108,7 @@ public class Piece
     setPiece(type, position);
   } 
   
-  public void render()
+  public boolean render(int drag, int position)
   {
     //set color
     Color thisColor = search.getColor(c);
@@ -100,6 +116,20 @@ public class Piece
     
     //detect drag
     for(int i = 0; i < shapeX.length; i++)
+    {
+      if(selected)
+      {
+        //set position
+        x = mouseX - xDist;
+        y = mouseY - yDist;
+      }
+      
+      //draw rectangle
+      rect(x + 50 * shapeX[i], y + 50 * shapeY[i], 50, 50);
+    }
+    
+    //return false if another piece is being dragged
+    if((drag == -1 || drag == position) && !selected)
     {
       if(
           (x < mouseX && mouseX < x + w * 50) &&
@@ -111,17 +141,10 @@ public class Piece
         //set offsets
         xDist = mouseX - x;
         yDist = mouseY - y;
+        return true;
       }
-      if(selected)
-      {
-        //set position
-        x = mouseX - xDist;
-        y = mouseY - yDist;
-      }
-      
-      //draw rectangle
-      rect(x + 50 * shapeX[i], y + 50 * shapeY[i], 50, 50);
     }
+    return false;
   }
   
   public void dragOff()
@@ -212,67 +235,158 @@ public class Piece
     {
       this.shapeX = new int[]{0};
       this.shapeY = new int[]{0};
-      this.c = 1; this.w = 1; this.h = 1;
     }
     else if(type.equals("H2")) //horizontal 2 blocks
     {
       this.shapeX = new int[]{0, 1};
       this.shapeY = new int[]{0, 0};
-      this.c = 2; this.w = 2; this.h = 1;
     }
     else if(type.equals("V2")) //vertical 2 blocks
     {
       this.shapeX = new int[]{0, 0};
       this.shapeY = new int[]{0, 1};
-      this.c = 3; this.w = 1; this.h = 2;
     }
     else if(type.equals("HI3")) //horizontal I-shaped 3 blocks
     {
       this.shapeX = new int[]{0, 1, 2};
       this.shapeY = new int[]{0, 0, 0};
-      this.c = 4; this.w = 3; this.h = 1;
     }
     else if(type.equals("VI3")) //vertical I-shaped 3 blocks
     {
       this.shapeX = new int[]{0, 0, 0};
       this.shapeY = new int[]{0, 1, 2};
-      this.c = 5; this.w = 1; this.h = 3;
     }
     else if(type.equals("UL3")) //upright L-shaped 3 blocks
     {
       this.shapeX = new int[]{0, 0, 1};
       this.shapeY = new int[]{0, 1, 1};
-      this.c = 6; this.w = 2; this.h = 2;
     }
     else if(type.equals("HL3")) //horizontally inverted L-shaped 3 blocks
     {
       this.shapeX = new int[]{0, 1, 0};
       this.shapeY = new int[]{0, 0, 1};
-      this.c = 1; this.w = 2; this.h = 2;
     }
     else if(type.equals("VL3")) //vertically inverted L-shaped 3 blocks
     {
       this.shapeX = new int[]{0, 1, 1};
       this.shapeY = new int[]{1, 1, 0};
-      this.c = 2; this.w = 2; this.h = 2;
+
     }
     else if(type.equals("OL3")) //origin inverted L-shaped 3 blocks
     {
       this.shapeX = new int[]{0, 1, 1};
       this.shapeY = new int[]{0, 0, 1};
-      this.c = 3; this.w = 2; this.h = 2;
     }
     else if(type.equals("S4")) //square 4 blocks
     {
       this.shapeX = new int[]{0, 0, 1, 1};
       this.shapeY = new int[]{0, 1, 1, 0};
-      this.c = 4; this.w = 2; this.h = 2;
     }
+    else if(type.equals("UT4")) //up T-shaped 4 blocks
+    {
+      this.shapeX = new int[]{1, 0, 1, 2};
+      this.shapeY = new int[]{0, 1, 1, 1};
+    }
+    else if(type.equals("RT4")) //right T-shaped 4 blocks
+    {
+      this.shapeX = new int[]{0, 0, 1, 0};
+      this.shapeY = new int[]{0, 1, 1, 2};
+    }
+    else if(type.equals("DT4")) //down T-shaped 4 blocks
+    {
+      this.shapeX = new int[]{0, 1, 2, 1};
+      this.shapeY = new int[]{0, 0, 0, 1};
+    }
+    else if(type.equals("LT4")) //left T-shaped 4 blocks
+    {
+      this.shapeX = new int[]{0, 1, 1, 1};
+      this.shapeY = new int[]{1, 0, 1, 2};
+    }
+    else if(type.equals("D3")) //diagonal 3 blocks
+    {
+      this.shapeX = new int[]{0, 1, 2};
+      this.shapeY = new int[]{0, 1, 2};
+    }
+    else if(type.equals("ID3")) //inverted diagonal 3 blocks
+    {
+      this.shapeX = new int[]{2, 1, 0};
+      this.shapeY = new int[]{0, 1, 2};
+    }
+    else if(type.equals("S9")) //square 9 blocks
+    {
+      this.shapeX = new int[]{0,1,2,0,1,2,0,1,2};
+      this.shapeY = new int[]{0,0,0,1,1,1,2,2,2};
+    }
+    else if(type.equals("UL4")) //up L-shaped 4 blocks
+    {
+      this.shapeX = new int[]{0, 0, 0, 1};
+      this.shapeY = new int[]{0, 1, 2, 2};
+    }
+    else if(type.equals("RL4")) //right L-shaped 4 blocks
+    {
+      this.shapeX = new int[]{0, 0, 1, 2};
+      this.shapeY = new int[]{1, 0, 0, 0};
+    }
+    else if(type.equals("DL4")) //down L-shaped 4 blocks
+    {
+      this.shapeX = new int[]{0, 1, 1, 1};
+      this.shapeY = new int[]{0, 0, 1, 2};
+    }
+    else if(type.equals("LL4")) //left L-shaped 4 blocks
+    {
+      this.shapeX = new int[]{0, 1, 2, 2};
+      this.shapeY = new int[]{1, 1, 1, 0};
+    }
+    else if(type.equals("J4")) //J-shaped 4 blocks
+    {
+      this.shapeX = new int[]{2, 2, 1, 0};
+      this.shapeY = new int[]{0, 1, 2, 1};
+    }
+    else if(type.equals("UJ4")) //up J-shaped 4 blocks
+    {
+      this.shapeX = new int[]{1, 1, 1, 0};
+      this.shapeY = new int[]{0, 1, 2, 2};
+    }
+    else if(type.equals("RJ4")) //right J-shaped 4 blocks
+    {
+      this.shapeX = new int[]{0, 0, 1, 2};
+      this.shapeY = new int[]{0, 1, 1, 1};
+    }
+    else if(type.equals("DJ4")) //down J-shaped 4 blocks
+    {
+      this.shapeX = new int[]{0, 1, 0, 0};
+      this.shapeY = new int[]{0, 0, 1, 2};
+    }
+    else if(type.equals("LJ4")) //left J-shaped 4 blocks
+    {
+      this.shapeX = new int[]{0, 1, 2, 2};
+      this.shapeY = new int[]{0, 0, 0, 1};
+    }
+    
+    int wMax = 0;
+    for(int xCoor : shapeX)
+    {
+      if(xCoor > wMax)
+      {
+        wMax = xCoor;
+      }
+    }
+    this.w = wMax + 1;
+    int yMax = 0;
+    for(int yCoor : shapeY)
+    {
+       if(yCoor > yMax)
+       {
+         yMax = yCoor;
+       }
+    }
+    this.h = yMax + 1;
     
     this.type = type;
     this.x0 = (200 - 50 * w) / 2 + position * 200;
     this.y0 = (200 - 50 * h) / 2 + 550;
     this.x = x0;
-    this.y =y0;
+    this.y = y0;
+    this.c = (int)(Math.random() * 6) + 1;
   }
 }
