@@ -39,10 +39,9 @@ public void setup()
 public void draw()
 {
   //fill background
-  background(54, 127, 245);
+  Color bgc = search.getColor(-2);
+  background(bgc.r, bgc.g, bgc.b);
   assignColors();
-  //TODO: Scheck for pieces to be cleared and make an hover effect
-  //TODO: make effects
   snapPieces();
   renderGrid();
   renderPieces();
@@ -172,8 +171,6 @@ public void reload()
   //reload pieces
   for(int i = 0; i < pieces.length; i++)
   {
-    //TODO: update fakeGrid so all pieces can be put
-    //TODO: then account for instances where space can be made by removing lines(ask mr rizzi)
     pieces[i] = new Piece(grid, i);
     if(pieces[i].over)
     {
@@ -250,6 +247,8 @@ public void clearLines()
   if(clearRows.size() + clearCols.size() > 0)
   {
     combo++;
+    //update theme
+    search.newTheme();
   }
   else
   {
@@ -263,7 +262,8 @@ public void clearLines()
 public void renderScore()
 {
   //set text color
-  fill(9, 54, 128);
+  Color bgc = search.getColor(0);
+  fill(bgc.r, bgc.g, bgc.b);
   
   //render score
   textSize(80);
@@ -291,7 +291,7 @@ public void renderPieces()
   {
     if(pieces[i] != null)
     {
-      if(pieces[i].render(drag, i))
+      if(pieces[i].render(drag, i, search))
       {
         drag = i;
       }
@@ -320,7 +320,8 @@ public void renderGrid()
 
 public void gameOver()
 {
-  background(54, 127, 245);
+  Color bgc = search.getColor(-2);
+  background(bgc.r, bgc.g, bgc.b);
   renderGrid();
   renderScore();
   

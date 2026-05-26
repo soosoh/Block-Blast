@@ -29,7 +29,21 @@ public class Piece
     "UJ4",
     "RJ4",
     "DJ4",
-    "LJ4"
+    "LJ4",
+    "US4",
+    "RS4",
+    "UZ4",
+    "RZ4",
+    "D2",
+    "ID2",
+    "P5",
+    "UR6",
+    "RR6",
+    "B5",
+    "UC5",
+    "RC5",
+    "DC5",
+    "LC5"
   };
   
   //individual block coordinates
@@ -38,8 +52,6 @@ public class Piece
   
   //color
   public int c;
-  //color search
-  public Color search = new Color(0, 0, 0);
   
   //origin and position
   public int x0, y0;
@@ -108,7 +120,7 @@ public class Piece
     setPiece(type, position);
   } 
   
-  public boolean render(int drag, int position)
+  public boolean render(int drag, int position, Color search)
   {
     //set color
     Color thisColor = search.getColor(c);
@@ -361,6 +373,81 @@ public class Piece
     {
       this.shapeX = new int[]{0, 1, 2, 2};
       this.shapeY = new int[]{0, 0, 0, 1};
+    }
+    else if(type.equals("US4")) //upright S-shaped 4 blocks
+    {
+      this.shapeX = new int[]{0, 1, 1, 2};
+      this.shapeY = new int[]{1, 1, 0, 0};
+    }
+    else if(type.equals("RS4")) //rotated S-shaped 4 blocks
+    {
+      this.shapeX = new int[]{0, 0, 1, 1};
+      this.shapeY = new int[]{0, 1, 1, 2};
+    }
+    else if(type.equals("UZ4")) //upright Z-shaped 4 blocks
+    {
+      this.shapeX = new int[]{0, 1, 1, 2};
+      this.shapeY = new int[]{0, 0, 1, 1};
+    }
+    else if(type.equals("RZ4")) //rotated Z-shaped 4 blocks
+    {
+      this.shapeX = new int[]{1, 1, 0, 0};
+      this.shapeY = new int[]{0, 1, 1, 2};
+    }
+    else if(type.equals("D2")) //diagonal 2 blocks
+    {
+      this.shapeX = new int[]{0, 1};
+      this.shapeY = new int[]{0, 1};
+    }
+    else if(type.equals("ID2")) //diagonal 2 blocks
+    {
+      this.shapeX = new int[]{1, 0};
+      this.shapeY = new int[]{0, 1};
+    }
+    else if(type.equals("P5")) //plus 5 blocks
+    {
+      this.shapeX = new int[]{0, 1, 1, 1, 2};
+      this.shapeY = new int[]{1, 0, 1, 2, 1};
+    }
+    else if(type.equals("UR6")) //upright rectangular 6 blocks
+    {
+      this.shapeX = new int[]{0, 0, 0, 1, 1, 1};
+      this.shapeY = new int[]{0, 1, 2, 0, 1, 2};
+    }
+    else if(type.equals("RR6")) //rotated rectangular 6 blocks
+    {
+      this.shapeX = new int[]{0, 1, 2, 0, 1, 2};
+      this.shapeY = new int[]{0, 0, 0, 1, 1, 1};
+    }
+    else if(type.equals("B5")) //B-shaped 5 blocks
+    {
+      this.shapeX = new int[]{0,0,0,1,1};
+      this.shapeY = new int[]{0,1,2,2,1};
+    }
+    else if(type.equals("UC5")) //up corner 5 blocks
+    {
+      this.shapeX = new int[]{0, 0, 0, 1, 2};
+      this.shapeY = new int[]{0, 1, 2, 0, 0};
+    }
+    else if(type.equals("RC5")) //right corner 5 blocks
+    {
+      this.shapeX = new int[]{0, 1, 2, 2, 2};
+      this.shapeY = new int[]{0, 0, 0, 1, 2};
+    }
+    else if(type.equals("DC5")) //down corner 5 blocks
+    {
+      this.shapeX = new int[]{2, 2, 2, 1, 0};
+      this.shapeY = new int[]{0, 1, 2, 2, 2};
+    }
+    else if(type.equals("LC5")) //left corner 5 blocks
+    {
+      this.shapeX = new int[]{0, 0, 0, 1, 2};
+      this.shapeY = new int[]{0, 1, 2, 2, 2};
+    }
+    else if(type.equals("")) //
+    {
+      this.shapeX = new int[]{};
+      this.shapeY = new int[]{};
     }
     
     int wMax = 0;
