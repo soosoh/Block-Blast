@@ -274,14 +274,6 @@ public void renderScore()
   textSize(30);
   textAlign(LEFT);
   text("x" + combo, 470, 70);
-  /*
-  if (60<=score&&score<=68 )
-  {
-    textSize(100);
-    textAlign(CENTER);
-    text( 67676767, 300,100);
-  }
-  */
 }
 
 public void renderPieces()
@@ -322,6 +314,7 @@ public void gameOver()
 {
   Color bgc = search.getColor(-2);
   background(bgc.r, bgc.g, bgc.b);
+  assignColors();
   renderGrid();
   renderScore();
   
