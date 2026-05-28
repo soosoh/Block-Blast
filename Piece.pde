@@ -25,7 +25,6 @@ public class Piece
     "RL4",
     "DL4",
     "LL4",
-    "J4",
     "UJ4",
     "RJ4",
     "DJ4",
